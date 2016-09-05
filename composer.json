@@ -1,0 +1,13 @@
+{
+  "autoload": {
+    "psr-0": {
+      "Test":  "src/",
+      "Shop":  "src/",
+      "Yurii": "vendor/",
+      "App":   "app/"
+    },
+    "files": [
+      "web/index.php"
+    ]
+  }
+}
