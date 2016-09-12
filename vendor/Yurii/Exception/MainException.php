@@ -2,7 +2,7 @@
 
 namespace Yurii\Exception;
 
-use Yurii\DI\Service;
+use Yurii\Services\ServiceFactory;
 use Yurii\Response\ResponseRedirect;
 use Yurii\Renderer\Renderer;
 use Yurii\Response\Response;
@@ -17,6 +17,7 @@ abstract class MainException extends \Exception {
     protected $type = 'info'; // default type of exception
     protected $beforeSolve = false; //flag for starting beforeSolve method (default off)
     protected $redirectAddress = '/'; // default redirect address to index page
+    protected $logger;
 
     protected function beforeSolveException() {} //by default this function is empty
 
@@ -38,16 +39,15 @@ abstract class MainException extends \Exception {
             }
 
             $renderer = new Renderer();
-            $responce = new Response($renderer::render(Service::get('config')->get500Layout(), $data), 'text/html', 202);
+            $responce = new Response($renderer::render(ServiceFactory::get('config'), $data), 'text/html', 202);
             $responce->send();
         }
         else if ($this->getMessage()) {
-            Service::get('session')->addFlush($this->type, $this->getMessage());
+            ServiceFactory::get('session')->addFlush($this->type, $this->getMessage());
 
             if ($this->beforeSolve) {
                 $this->beforeSolveException();
             }
-            echo $this->redirectAddress;
 
             $redirect = new ResponseRedirect($this->redirectAddress);
             $redirect->sendHeaders();
@@ -55,5 +55,11 @@ abstract class MainException extends \Exception {
         else {
             throw new ServiceException(500);
         }
+    }
+
+    public function __construct($message, $code = null) {
+        $this->logger = ServiceFactory::get('log');
+        $this->logger->addLog(__CLASS__ . ': ' . $message, $this->type);
+        parent::__construct($message, $code);
     }
 }

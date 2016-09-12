@@ -2,11 +2,12 @@
 
 namespace Yurii\Controller;
 
-use Yurii\DI\Service;
+use Yurii\Services\ServiceFactory;
 use Yurii\Response\Response;
 use Yurii\Response\ResponseRedirect;
 use Yurii\Request\Request;
 use Yurii\Renderer\Renderer;
+use Yurii\Router\Router;
 
 /**
  * Class Controller
@@ -15,7 +16,7 @@ use Yurii\Renderer\Renderer;
  * main abstract controller class
  */
 abstract class Controller {
-    public $title, $content, $date;
+    public $title, $content, $date, $router;
 
     /**
      * @return Request object
@@ -43,8 +44,7 @@ abstract class Controller {
         } else {
             $fullPath = $layout;
         }
-
-        $renderer = $this->getRenderer();
+        $renderer = $this->getRenderer(get_class($this));
         $content = $renderer::render($fullPath, $data);
         return new Response($content);
     }
@@ -60,11 +60,11 @@ abstract class Controller {
 
         if (empty($src)) {
             $path = preg_replace('/Controller$/', '', str_replace("\\", '/', get_class($this))); // create path to view
-            $path = preg_replace('/Controller/', 'views', $path) . '/' . $shortPath . '.php';
+            $path = preg_replace('/Controller/', 'View', $path) . '/' . $shortPath . '.php';
         }
         else {
             $path = preg_replace('#/[\w]+Controller$#', '/' . $src['controller'], str_replace("\\", '/', get_class($this))); // create path to view using src data
-            $path = preg_replace('/Controller/', 'views', $path) . '/' . $shortPath . '.php';
+            $path = preg_replace('/Controller/', 'View', $path) . '/' . $shortPath . '.php';
             $path = preg_replace('#^[\w]+?/#', '/' . $src['src'] . '/', $path);
         }
 
@@ -101,7 +101,10 @@ abstract class Controller {
      * delegate RouteServise
      */
     function generateRoute($name, $data = array()) {
-        return Service::get('router')->generateRoute($name, $data);
+        if (empty($this->router)) {
+            $this->router = Router::getInstance();
+        }
+        return $this->router->generateRoute($name, $data);
     }
 
 }

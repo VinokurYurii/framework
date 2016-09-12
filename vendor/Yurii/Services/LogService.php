@@ -4,6 +4,7 @@ namespace Yurii\Services;
 
 class LogService implements ServiceInterface {
     private static $instance;
+    private static $num = 0;
     public static function getInstance() {
         if(empty(self::$instance)) {
             self::$instance = new self();
@@ -11,13 +12,10 @@ class LogService implements ServiceInterface {
         return self::$instance;
     }
     public function addLog($log, $logLevel = 'info') {
-        $path = __DIR__ . '/../../log/log.txt';
-        if(!file_exists($path)) {
-            fopen($path, 'w');
-        }
+        self::$num += 1;
+        $path = __DIR__ . '/../../../tmp/log.txt';
         $time = date("m.d.y H:i:s");
-        $fp = fopen($path, 'a');
-        fwrite($fp, $time . ' / ' . $logLevel . ' / ' . $log . "\n");
-        fclose($fp);
+
+        file_put_contents($path, $time . ' / ' . $logLevel . ' / ' . $log . ' || ' . self::$num . "\n", FILE_APPEND);
     }
 }

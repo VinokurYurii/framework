@@ -14,7 +14,8 @@ class Response {
     /**
      * @codes array collect most useless codes
      */
-    private static $codes = array(200 => 'Ok',
+    private static $codes = array(
+                                200 => 'Ok',
                                 202 => 'No Content',
                                 303 => 'See Other',
                                 400 => 'Bad Request',

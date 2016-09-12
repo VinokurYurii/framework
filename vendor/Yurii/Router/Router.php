@@ -75,29 +75,6 @@ class Router {
         return null;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function parseRoute($url){
         if(!preg_match('~/$~', $url)) {
             $url .= '/';

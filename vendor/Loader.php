@@ -21,14 +21,14 @@ class Loader {
         foreach(self::$namespaces as $namespace => $nsRootPath) { //checking self::$namespaces for matching
             if(preg_match("/^" . $namespace . "/", $classname)) {
                 $path =  $namespace . substr($classname, strlen($namespace));
-                $path = $nsRootPath . str_replace("\\", "/", $path) . '.php';
+                $path = $nsRootPath . str_replace("\\", DIRECTORY_SEPARATOR, $path) . '.php';
                 break;
             }
         }
 
         if(empty($path)) { //if self::$namespace haven't matches search in framework
             $path = str_replace('Application', '', $classname);
-            $path = __DIR__ . str_replace("\\", "/", $path) . '.php';
+            $path = __DIR__ . str_replace("\\", DIRECTORY_SEPARATOR, $path) . '.php';
         }
 
         if(!file_exists($path)){
@@ -46,7 +46,7 @@ class Loader {
 
     public static function addNamespacePath($namespace, $nsRootPath) { //add additional namespaces
         if(!preg_match("/\/$/", $nsRootPath)) { //checking slash at the end of path and add it, if it need
-            $nsRootPath .= '/';
+            $nsRootPath .= DIRECTORY_SEPARATOR;
         }
         self::$namespaces[$namespace] = $nsRootPath;
     }

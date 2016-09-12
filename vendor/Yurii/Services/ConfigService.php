@@ -25,7 +25,11 @@ class ConfigService implements ServiceInterface {
         }
     }
 
-    public function setConfig($config) {
+    public function addConfig($config) {
         self::$config = $config;
+    }
+
+    public function setConfig($param, $value) {
+        self::$config[$param] = $value;
     }
 }

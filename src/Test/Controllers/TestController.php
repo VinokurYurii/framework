@@ -2,15 +2,17 @@
 
 namespace Test\Controllers;
 
-class TestController {
+use Yurii\Controller\Controller;
+
+class TestController extends Controller {
     /**
      * @Route(
-     *     pattern=/test/another,
+     *     pattern=/test,
      *     name=another_action
      * )
      */
     public function anotherAction() {
-        return 'Another Action TestController<br>';
+        return $this->render('Another Action TestController<br>');
     }
 
 }

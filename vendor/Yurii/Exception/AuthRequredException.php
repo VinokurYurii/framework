@@ -2,7 +2,7 @@
 
 namespace Yurii\Exception;
 
-use Yurii\DI\Service;
+use Yurii\Services\ServiceFactory;
 
 /**
  * Class AuthRequredException
@@ -21,7 +21,7 @@ class AuthRequredException extends MainException {
      */
     protected function beforeSolveException() {
         if (isset($_SERVER['REQUEST_URI'])) {
-            Service::get('session')->returnUrl = $_SERVER['REQUEST_URI'];
+            ServiceFactory::get('session')->returnUrl = $_SERVER['REQUEST_URI'];
         }
     }
 }

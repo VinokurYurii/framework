@@ -34,15 +34,9 @@ class Application {
         self::$config = $config;
 
         ServiceFactory::get('session')->startSession();
-        ServiceFactory::get('config')->setConfig(self::$config);
+        ServiceFactory::get('config')->addConfig(self::$config);
+        ServiceFactory::get('config')->setConfig('app_path', realpath(__DIR__ . '/../../'));//adding application path to config
         self::$router = Router::getInstance();
-        $connection = ServiceFactory::get('db')->getConnection();
-        $user = new User();
-        $connection->query('SELECT * FROM users');
-        $users = $connection->fetchObject(get_class($user));
-        echo '<pre>';
-        var_dump($users);
-        //ServiceFactory::get('db')->getConnection(self::$config['pdo']);// initialize connection to DB
     }
 
     /**
@@ -59,7 +53,6 @@ class Application {
         if ($controllerReflication->hasMethod($action)) {
             $controller = $controllerReflication->newInstance();
             $actionReflication = $controllerReflication->getMethod($action);
-
             if (!empty($data)) {
                 $response = $actionReflication->invokeArgs($controller, $data);
             } else {
@@ -76,6 +69,7 @@ class Application {
                 $response->send();
             }
             else {
+                echo 'throw new HttpNotFoundException(501) ' . $controllerReflication->getNamespaceName(); die;
                 throw new HttpNotFoundException(501);
             }
         }
@@ -93,6 +87,7 @@ class Application {
         /**
          * get route depending on REQUEST_URI
          */
+
         $route = self::$router->parseRoute(htmlspecialchars($_SERVER['REQUEST_URI']));
         try {
             if (!empty($route)) {
@@ -116,6 +111,7 @@ class Application {
                 self::runControllerMethod($route['controller'], $route['action'],
                     isset($route['params']) ? $route['params'] : '');
             } else {
+                die('throw new HttpNotFoundException');
                 throw new HttpNotFoundException('Route not found');
             }
         } catch (MainException $e) {

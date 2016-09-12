@@ -87,14 +87,17 @@ class ParseAnnotations {
         $routesArray = array();
 
         foreach($rawAnnotation as $controller => $actions) {
+
             foreach($actions as $actionName => $annotation) {
-                $params = self::parseAnnotations($annotation[0]);
-                if(isset($params['name']) && !empty($params['name'])) {
-                    $name = $params['name'];
-                    unset($params['name']);
-                    $routesArray[$name] =$params;
-                    $routesArray[$name]['controller'] = $controller;
-                    $routesArray[$name]['action'] = str_replace('Action', '', $actionName);
+                if( preg_match('/Action$/', $actionName) && !empty($annotation)) {
+                    $params = self::parseAnnotations($annotation[0]);
+                    if(isset($params['name']) && !empty($params['name'])) {
+                        $name = $params['name'];
+                        unset($params['name']);
+                        $routesArray[$name] = $params;
+                        $routesArray[$name]['controller'] = $controller;
+                        $routesArray[$name]['action'] = str_replace('Action', '', $actionName);
+                    }
                 }
             }
         }
