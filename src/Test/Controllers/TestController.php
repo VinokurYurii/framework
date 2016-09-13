@@ -12,7 +12,8 @@ class TestController extends Controller {
      * )
      */
     public function anotherAction() {
-        return $this->render('Another Action TestController<br>');
+        return $this->render('app.html', array(
+            'src' => array('src' => 'App', 'controller' => 'App')));
     }
 
 }

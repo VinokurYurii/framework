@@ -69,6 +69,8 @@ class Application {
                 $response->send();
             }
             else {
+                echo '<pre>';
+                var_dump($response);
                 echo 'throw new HttpNotFoundException(501) ' . $controllerReflication->getNamespaceName(); die;
                 throw new HttpNotFoundException(501);
             }

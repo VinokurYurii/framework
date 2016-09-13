@@ -2,6 +2,7 @@
 
 namespace Yurii\Controller;
 
+use Yurii\Exception\HttpNotFoundException;
 use Yurii\Services\ServiceFactory;
 use Yurii\Response\Response;
 use Yurii\Response\ResponseRedirect;
@@ -57,25 +58,36 @@ abstract class Controller {
      * processed path and return full path to view
      */
     protected function handleViewPath($shortPath, $src = array()) { //find path to view
+        $app_path = ServiceFactory::get('config')->getConfig('app_path');
+        $map = ServiceFactory::get('config')->getConfig('namespaces');
 
-        if (empty($src)) {
-            $path = preg_replace('/Controller$/', '', str_replace("\\", '/', get_class($this))); // create path to view
-            $path = preg_replace('/Controller/', 'View', $path) . '/' . $shortPath . '.php';
+        $full_path = '';
+        if (empty($src)) {// if we haven't special modifications for view
+            foreach($map as $namespace => $dir) {//looking namespace in namespaces map
+                $class = get_class($this);
+                if(preg_match('/^' . $namespace . '/', $class)) {
+                    //construct path based on controller namespace
+                    $path = $app_path . '/' . $dir . preg_replace('/Controller$/', '', str_replace("\\", '/', $class));
+                    $full_path =  preg_replace('/Controllers/', 'Views', $path) . '/' . $shortPath . '.php';
+                    break;
+                }
+            }
         }
         else {
-            $path = preg_replace('#/[\w]+Controller$#', '/' . $src['controller'], str_replace("\\", '/', get_class($this))); // create path to view using src data
-            $path = preg_replace('/Controller/', 'View', $path) . '/' . $shortPath . '.php';
-            $path = preg_replace('#^[\w]+?/#', '/' . $src['src'] . '/', $path);
+            foreach($map as $namespace => $dir) {//looking namespace in namespaces map
+                if($namespace == $src['src']) {
+                    //construct path based on controller namespace
+                    $full_path = $app_path . '/' . $dir . $namespace . '/Views/' . $src['controller'] . '/' . $shortPath . '.php';
+                    break;
+                }
+            }
         }
 
-        if (preg_match('/^Yurii/', $path)) {
-            $path = preg_replace('/^Yurii/', '/framework', $path);
-        } else {
-            $path = '/src/' . $path;
+        $full_path = str_replace('/', DIRECTORY_SEPARATOR, $full_path);
+        if(!file_exists($full_path)) {
+            throw new HttpNotFoundException('file ' . $shortPath . '(' . $full_path . ')' . ' doesn\'t exist');
         }
-
-        $dir = realpath(__DIR__ . '/../../'); //get real path to framework directory
-        return $dir . $path; // full path to wiew
+        return $full_path;
 
     }
 

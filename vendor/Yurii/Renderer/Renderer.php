@@ -45,7 +45,7 @@ class Renderer {
     private function findMainLayoutByControllerNamespace($namespace, $bad_layout = false) {
         $app_path = ServiceFactory::get('config')->getConfig('app_path');
         $map = ServiceFactory::get('config')->getConfig('namespaces');
-        $main_layout_path = $app_path . '/App/View/layouts/layout.html.php';//default layout path
+        $main_layout_path = $app_path . '/App/Views/layouts/main_layout.html.php';//default layout path
 
         if ($bad_layout) {
             return $main_layout_path;
@@ -53,14 +53,14 @@ class Renderer {
 
         foreach($map as $prefix => $dir) {
             if(preg_match('/^' . $prefix . '/', $namespace)) {
-                $path = $app_path . '/' . $dir . $prefix . '/View/layouts/layout.html.php';
+                $path = $app_path . '/' . $dir . $prefix . '/Views/layouts/layout.html.php';
                 if(file_exists($path)) {
                     $main_layout_path = $path;
                 }
                 break;
             }
         }
-        return $main_layout_path;
+        return str_replace('/', DIRECTORY_SEPARATOR, $main_layout_path);
     }
 
     public static function renderMain($content, $flush = array(array())) { //render layout

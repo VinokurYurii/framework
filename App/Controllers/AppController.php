@@ -2,27 +2,24 @@
 
 namespace App\Controllers;
 
+use Yurii\Controller\Controller;
+
 /**
  * Class ShopController
  * @package Shop\Controllers
  */
-class AppController {
+class AppController extends Controller {
     /**
      * @Route(
-     *     pattern=/sto,
+     *     pattern=/sto/{id},
      *     name=app_action,
      *     _requirements=[
-     *         product= \w+,
      *          id = \d+
-     *     ],
-     *     _reqents=[
-     *         proct= tt+,
-     *          d = \g+
      *     ]
      * )
      */
     public function someAction($product) {
-        return 'Some Action ShopController product: ' . $product . '<br>';
+        return $this->render('app.html');
     }
 
     /**
